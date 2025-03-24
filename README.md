@@ -1,1 +1,1 @@
-# Analise_Psicometrica_SQR20
+# Analise Psicometrica SQR20
