@@ -1,0 +1,705 @@
+---
+title: "Análise Psicométrica da escala de rastreio SQR-20 usando dados do GAPSI e
+  Apoia USP"
+author:
+- Gabriela Amaral (gabrielajj.ga@usp.br)
+- Jorge Luis Bazán (jlbazan@icmc.usp.br)
+- Brunna Quatrochi (brunnaquatrochi@usp.br)
+- Emanuela Pap da Silva (emanuela@sc.usp.br)
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+Trabalho desenvolvido como parte dos projetos 
+das edições 2023-2024 e 2024-2025 do Programa Unificado de Bolsas de Estudo para apoio à Formação de Estudantes de Graduação da Universidade de São Paulo (PUB-USP).
+
+Orientação: Jorge Luis Bazán
+
+Agradecimentos: Emanuela Pap da Silva, Assistente Social do Serviço de Promoção Social da USP São Carlos, e Tais Bleicher, Professora do Departamento de Psicologia da UFSCar autores dos questionario e dos estudios que deram origem aos dados estudados.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Resumo
+
+Neste notebook, é realizada uma análise psicométrica da escala de rastreamento SRQ-20, composta por vinte itens dicotômicos que avaliam indicadores de transtornos mentais comuns (TMC), com respostas "sim" ou "não". Foram utilizadas bases de dados dos anos de 2021, 2022 e 2023, obtidas por meio de questionários aplicados pela GAPSI e Apoia USP, que são serviços de apoio psicossocial à saúde mental da comunidade universitária da USP, campus de São Carlos, respondidos por alunos de graduação deste campus. Os resultados indicam que o teste é confiável e unidimensional, e os escores do TMC podem ser obtidos tanto pela teoria clássica dos testes quanto pelo modelo de dois parâmetros da teoria da resposta ao item (TRI). O modelo TRI de dois parâmetros foi escolhido como o melhor modelo para
+reportar os escores do TMC que medem o sofrimento mental.
+No modelo escolhido, os itens são caracterizados pelos parâmetros de dificuldade e discriminação. A dificuldade de um item pode ser interpretada como a gravidade do sintoma abordado pela questão, enquanto o parâmetro de discriminação mede a eficácia do item em diferenciar respondentes com diferentes níveis de sofrimento mental avaliado. Uma avaliação do modelo foi realizada, e os resultados foram salvos. A análise realizada neste estudo permitiu identificar as características psicométricas dos itens, oferecendo uma compreensão mais aprofundada das propriedades do instrumento e sua adequação para avaliar a saúde mental dos estudantes.
+
+
+
+# Introdução
+
+
+O SRQ-20 é uma escala de rastreio composta por vinte itens dicotômicos, com respostas "sim" ou "não". Desenvolvido pela Organização Mundial da Saúde (OMS), o instrumento não tem o objetivo de produzir diagnóstico, e, sim, indicar a suspeita de transtornos do humor, de ansiedade e de somatização, denominados na literatura como Transtornos Mentais Comuns (TMC) especialmente em contextos de atenção primária. Ele é composto por 20 questões com respostas sim/não, referentes aos últimos 30 dias do momento do preenchimento, sobre sintomas psíquicos e somáticos. 
+
+Sua praticidade e objetividade tornaram o SRQ-20 amplamente utilizado em diversos países, sendo empregado em inúmeras pesquisas ao redor do mundo. Veja Silveira et al. (2022)[^7].
+
+
+Questionários desenvolvidos pelo GAPSI e pelo Apoia USP foram aplicados nos anos de 2021, 2022 e 2023, com o objetivo de explorar diferentes aspectos do estado psíquico dos estudantes da graduação e identificar tanto as dificuldades quanto as potencialidades associadas à vivência acadêmica na comunidade USP de São Carlos. A escala de rastreio SRQ-20 faz parte dos questionários e as respostas dos estudantes será usada para desenvolver uma análise psicométrica da escala de rastreio SRQ-20.
+
+
+# Pacotes
+
+Instalação dos pacotes que serão usados para analisar os dados:
+
+```{r  echo=TRUE,comment = NA, message=FALSE,warning = FALSE}
+# install.packages("ltm")
+# install.packages("psych")
+# install.packages("readxl")
+# install.packages("foreign")
+# install.packages("psychometric")
+# install.packages("rtools")
+# install.packages("mirtCAT")
+# install.packages("openxlsx")
+
+library(ggplot2)
+library(readxl)
+require(foreign)
+library(ltm)
+library(mirt)
+library(psych)
+library(psychometric)
+library(irtoys)
+library(mirtCAT)
+library(openxlsx)
+```
+
+# 1 Importando a Base de dados
+
+O conjunto de dados utilizado neste estudo abrange 823 estudantes e contém 20 variáveis dicotômicas ("sim" e "não") relacionadas aos itens do SRQ-20. Essas informações foram obtidas por meio de um formulário aplicado a alunos de graduação. As perguntas incluídas no questionário são descritas a seguir:
+
+
+* **SRQ01**: Você tem dores de cabeça frequentes?
+* **SRQ02**: Tem falta de apetite?
+* **SRQ03**: Dorme mal?
+* **SRQ04**: Assusta-se com facilidade?
+* **SRQ05**: Tem tremores nas mãos?
+* **SRQ06**: Sente-se nervoso(a), tenso(a) ou preocupado(a)?
+* **SRQ07**: Tem má digestão?
+* **SRQ08**: Tem dificuldade de pensar com clareza?
+* **SRQ09**: Tem se sentido triste ultimamente?
+* **SRQ10**: Tem chorado mais do que de costume?
+* **SRQ11**: Encontra dificuldades para realizar com satisfação suas atividades diárias?
+* **SRQ12**: Tem dificuldade para tomar decisões?
+* **SRQ13**: Tem dificuldade no serviço (seu trabalho é penoso, causa-lhe sofrimento)?
+* **SRQ14**: É incapaz de desempenhar um papel útil em sua vida?
+* **SRQ15**: Tem perdido o interesse pelas coisas?
+* **SRQ16**: Você se sente uma pessoa inútil, sem préstimo?
+* **SRQ17**: Tem tido ideia de acabar com a vida?
+* **SRQ18**: Sente-se cansado(a) o tempo todo?
+* **SRQ19**: Você se cansa com facilidade?
+* **SRQ20**: Tem sensações desagradáveis no estômago?
+
+A escala explora sintomas não psicóticos, como insônia, fadiga, alterações no apetite, dificuldades de pensamento, alterações de humor e problemas somáticos, que são manifestações típicas dos TMC. 
+ 
+Primeiro, faremos a leitura dos dados e selecionaremos os itens do SRQ-20 que serão analisados.
+
+```{r}
+#setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+df1 <- read_excel("DadosNotebook.xlsx")
+
+# Selecionando apenas as questões do SRQ
+df_srq <- subset(df1, select = c(2:21))
+
+# Renomeando as colunas do df_srq de SRQ01 a SRQ20
+colnames(df_srq) <- sprintf("SRQ%02d", 1:20)
+
+# Convertendo para número
+df_srq[] <- lapply(df_srq, function(x) if(is.character(x)) as.numeric(x) else x)
+
+```
+
+# 2 Teoria Clássica dos Testes (TCT)
+
+A Teoria Clássica dos Testes (TCT), também conhecido como modelo clássico dos testes, foi desenvolvido a partir de trabalhos de Spearman e Binet (Sartes & Souza-Formigoni 2013)[^1]. Ela é uma abordagem da Psicometria que determina a dificuldade dos itens de um teste ou a habilidade (ou desempenho) daqueles que foram submetidos a esse teste, sendo o principal objetivo desse modelo a compreensão e melhoria da confiabilidade dos testes (Bazán, 2018)[^2]. 
+
+A TCT se baseia na ideia principal de que é possível estimar a pontuação verdadeira de um indivíduo a partir do valor observado pelo teste, devido a associação entre tais variáveis. O método define o seguinte:
+  
+$$X = V + E$$
+  
+em que $X$ é o escore (ou valor) observado, $V$ é o escore (ou pontuação) verdadeiro e $E$ é o erro aleatório. Temos que a esperança do escore observado é igual ao escore verdadeiro, ou seja, quanto maior a amostra observada, maior é a precisão do resultado do teste.
+
+
+
+Neste estudo, inicialmente desenvolvemos uma análise clássica de itens com as principais estatísticas para os items do questionário. Além disso, obtivemos as estimativas de Alfa de Cronbach do questionário, usual para analisar sua confiabilidade e a contribuição das questões nela. Ambas as análises são descritas a seguir.
+
+## 2.1 Analise Classica de Itens
+
+A análise clássica de itens é um método para avaliar a qualidade dos itens de teste usando a Teoria Clássica de Testes (TCT).  Esta análise é uma abordagem simples e intuitiva que usa estatísticas descritivas para avaliar a eficácia de cada item com foco na média e desvio padrão. No caso de um questionário com itens dicotômicos  ou binários, a média de cada item é a proporção de resposta obtida na resposta Sim ($p$) sendo interpretada como a dificuldade do item ou questão.
+Assim, alguns pesquisadores identificaram itens com valores
+menores que 0,30 como itens difíceis e aqueles maiores que 0,70 como itens fáceis. Os itens muito fáceis e os itens muito difíceis podem precisar ser revisados para obter um teste válido. Um bom teste deve ter uma variedade de itens, desde fácil, itens moderados a difíceis de acordo com Wright e Stone (1979)[^16].
+
+Também no caso de itens dicotômicosou binários, a maior variabilidade é obtida quando a média é $p=0,5$. Neste caso, a variância do item $i$ é $\sigma_{x_i}^2=p\times (1-p)=0,25$ e o desvio padrão é $\sigma_{x_i}=0,5$. Maior variabilidade é desejável para que o item consiga capturar uma maior diversidade de respostas.
+
+A função *describe* no pacote psych destina-se a produzir as estatísticas solicitadas com mais frequência em estudos psicométricos e de psicologia, apresentando-as de forma clara em uma tabela de fácil leitura.
+
+
+```{r}
+# Análise descritiva dos itens
+des<-describe(df_srq)
+print(des,digits=3) 
+```
+
+Baseado nos resultados mostrados, verifica-se que as três questões com médias mais altas, ou seja, as questões em que há mais indivíduos que responderam "Sim" para a questão, são: "Sente-se nervoso(a), tenso(a) ou preocupado(a)?" (SRQ06), "Encontra dificuldades para realizar com satisfação suas atividades diárias?" (SQR11) e "Você se cansa com facilidade?" (SRQ19). Temos que 86%, 72% e 72%, respectivamente, dos indivíduos confirmaram ter tais características, proporções significativas. Esses ítens estão principalmente ligados a aspectos emocionais e físicos relacionados ao estresse e ao bem-estar geral. Desde um ponto de vista da TCT podemos dizer
+que estes itens foram fáceis. 
+ 
+Em contrapartida, verifica-se que as três questões  com médias mais baixas são: "Tem tremores nas mãos?" (SRQ05), "Tem chorado mais do que de costume?" (SRQ10) e "Tem tido ideia de acabar com a vida?" (SRQ17). Observa-se que 30%, 32% e 19% dos indivíduos apresentam esses sintomas. Embora sejam as proporções mais baixas entre as perguntas, são números significativos e que não devem ser ignorados. Esses sintomas, embora menos prevalentes, podem estar associados a questões graves de saúde mental, como transtornos de ansiedade e depressão, e merecem atenção especial. Desde um ponto de vista da TCT podemos dizer que estes itens são difíceis. 
+
+Analisando os desvios padrão das questões, nota-se que seus valores são semelhantes com valores que variam entre 0.45 e 0.50 com exceção das perguntas "Sente-se nervoso(a), tenso(a) ou preocupado(a)?" (SRQ06) e "Tem tido ideia de acabar com a vida?" (SRQ17), que apresentam desvios padrão mais baixos, 0.35 e 0.39, respectivamente. 
+Entretanto, na maioria dos ítens há há uma dispersão similar que é próxima da maior variabilidade esperada e, portanto, adequados. Já as questoes SRQ06 e 
+SRQ17 apresentam uma menor variabilidade. No caso do item SRQ06 por ser o item mais fácil e no caso do item SRQ17 por ser o mais difícil. Em ambos os casos, estes itens requerem cuidado nas interpretações.
+  
+
+## 2.2 Alfa de Cronbach Ordinal
+  
+O alfa de Cronbach é indice obtido para avaliar a confiabilidade de um questionário comparando a quantidade de variância compartilhada, ou covariância, entre os itens que compõem o questionário com a quantidade de variância geral. Este índice é considerado uma medida de consistência interna do questionário e é definido como
+
+$$\alpha = {k \over k-1 } \left(1 - {\sum_{i=1}^k \sigma^2_{x_i} \over \sigma^2_X} \right)={k \over k-1 } \left(\dfrac{2\sum_{i< j} \sigma_{x_ix_j}}{\sigma^2_X} \right)=
+{k \bar{c} \over \bar{v} + (k - 1) \bar{c}}$$
+
+em que:
+
+$k$ é o número de itens ou questões do questionário,
+$\sigma_{x_i}^2$ é a variância das respostas de cada item $i$, 
+$\sigma_{x_ix_j}$ é a covariancia entre as respostas do itens $i$ e $j$,
+$\sigma_X^2=\sum_{i=1}^n\sigma^2_{x_i}+ 2\sum_{i< j} \sigma_{x_ix_j}$ é a variância do escore total obtido considerando $X =\sum_{i=1}^k x_i$, 
+$\bar{v}=\frac{\sum_{i=1}^n\sigma^2_{x_i}}{k}$ é a média das variancias dos ítens
+e $\bar{c}=\frac{\sigma_{x_ix_j}}{k(k-1)}$ é a média das covariancias entre os itens.
+
+As expressões anteriores podem ser expresadas também em termos de correlações
+dos itens desde que as covariancias são $\sigma_{x_ix_j}=r_{x_ix_j}\times \sigma_{x_i}\times\sigma_{x_j}.$
+
+Neste estudo, utilizamos o Alfa de Cronbach Ordinal, que, diferentemente do Alfa de Cronbach tradicional, emprega a matriz de correlações tetracóricas em vez da matriz de covariâncias de Pearson. Essa abordagem foi escolhida porque o cálculo do Alfa de Cronbach convencional assume que os dados são contínuos, o que não corresponde ao nosso caso, já que os dados são dicotômicos. Quando essa suposição é violada, como ocorre com dados categóricos, a matriz de covariâncias de Pearson pode apresentar distorções, comprometendo a estimativa do coeficiente alfa (Gadermann et al., 2012)[^4].
+
+O alfa de Cronbach é um coeficiente que quando mais perto de 1 sinaliza que os escores obtidos de um conjunto de itens serão mais confiáveis. Como os dados do questionário estão baseados numa escala de respostas ordinais, como demostrado por Zumbo et al. (2017)[^17], o alfa ordinal é mais apropriado do que o alfa de Cronbach tradicional. Nunnally & Berstein (1994) sinalizam que um valor mínimo de 0,8 é recomendável na pesquisa aplicada. 
+Adicionalmente é fornecida a correlação do item com o resto das questões, assim como o alfa de Cronbach do questionário excluindo um determinado item o de melhor forma, se o item é eliminado. O objetivo é criar testes com o menor número de itens que ainda forneçam o nível de confiabilidade desejado.
+
+
+```{r}
+#itemstats(df_srq)
+#Alfa ordinal
+#Correlação dados ordinais
+#ord1<-polychoric(df_srq)
+#Correlação dados dicotômicos
+ord2<-tetrachoric(df_srq)
+#ord2
+psych::alpha(ord2$rho)
+```
+
+Para encontrar o Alfa de Cronbach do questionário, primeiro calculamos a matriz de correlações tetracóricas entre os itens
+dado que eles são binários (se forem ordinais teria que ser calculada a matriz de correlações polycóricas) usando a função
+tetrachoric do pacote psych e então
+usando a matriz de correlações calculada é aplicada a função alpha do pacote psych para obter o Alfa de cronbach e outras
+estatísticas descritas em Revelle (2024).
+
+
+Primeiramente, vamos avaliar o Alfa de Cronbach Ordinal do questionário. A avaliação dessa medida se dará considerando as definições de Landis & Koch (1977) e Streiner (2003), que são explicadas por César Gonçalves[^5]. 
+
+Considerando todos os itens, obtemos um alfa igual a 0.94. Essa medida, que é superior a 0.80, segundo Landis & Koch (1977), indica que a consistência interna do teste é quase perfeita. Entretanto, considerando a afirmação de Streiner (2003) de que os valores ideais do alfa devem estar entre 0.80 e 0.90, temos que pode estar ocorrendo redundância ou duplicações de informações, ou seja, ocorrência de itens que estão medindo exatamente o mesmo elemento.
+
+
+Para fazer a análise desses resultados, vamos verificar as estatísticas `raw_alpha`, `average_r` e `r.drop`, que serão detalhadas à medida que as análises forem realizadas.
+
+Agora, vamos analisar o Alfa de Cronbach do questionário quando um determinado item é eliminado verificando se o valor de alfa é mais alto, permanece igual o piora. Isso é reportado como `raw_alpha` na saída apresentada acima. Levando em conta estes resultados observamos que
+quando os itens "Você tem dores de cabeça frequentes?" (SRQ01), "Tem falta de apetite?" (SRQ02), "Dorme mal?" (SRQ03), "Assusta-se com facilidade?" (SRQ04) ou "Tem tremores nas mãos?" (SRQ05) são retirados, temos que o valor de alfa permanece igual a 0.94, ou seja, a confiabilidade do teste permanece a mesma. Assim, poderíamos propor tirar esses itens já que não contribuem para a melhoria da confiabilidade do teste, no entanto, devido à relevância dessas questões para a avaliação psicológica, estas perguntas serão mantidas. 
+
+
+Por outro lado, quando um dos demais itens são retirados, que incluem por exemplo "Tem se sentido triste ultimamente?" (SRQ09), "Tem chorado mais do que de costume?" (SRQ10), "Você se sente uma pessoa inútil, sem préstimo?" (SRQ16) e "Tem tido ideia de acabar com a vida?" (SRQ17),  o valor de Alfa de Cronbach tem uma leve redução de 0.94 para 0.93. Desse modo, o retiro dos itens de SRQ06 a SRQ20 apresentam impacto negativo na confiabilidade do teste e por tanto devem ser mantidos, dada a sua importância para o estudo.
+
+Agora, analisaremos os resultados de `average_r` que se refere a média da correlação de um determinado item com os outros. Neste caso, encontramos valores acima de 0,42 em todos os itens, sinalizando o relacionamento entre cada item com os demais.
+
+
+Por fim, analisaremos `r.drop`, que mede a correlação entre o escore de um item e o escore total dos outros itens sem ele. Essa medida é importante para verificar se determinado item está medindo as mesmas características dos outros itens.
+
+Temos que os itens com as menores correlações são 4 e 5, que se referem, respectivamente, às perguntas "Assusta-se com facilidade?" (SRQ04) e "Tem tremores nas mãos?" (SRQ05). Ambos os itens apresentam valores iguais a 0.45 para a medida em questão, indicando que possuem correlação moderada com os outros itens.
+
+Por outro lado, os itens com as maiores correlações são "Sente-se nervoso(a), tenso(a) ou preocupado(a)?" (SRQ06), "Tem dificuldade de pensar com clareza?" (SRQ08), "Tem se sentido triste ultimamente?" (SRQ09), "Encontra dificuldades para realizar com satisfação suas atividades diárias?" (SRQ11), "Você se sente uma pessoa inútil, sem préstimo?" (SRQ16) e "Sente-se cansado(a) o tempo todo?" (SRQ18). Esses itens apresentam correlações iguais a 0.75, 0.74, 0.71, 0.70 e 0.73, respectivamente. Esses valores indicam que esses itens têm uma correlação alta com os outros itens do questionário, sugerindo que tais itens medem características semelhantes ou iguais ao restante das questões.
+
+De modo geral, com as análises mostradas, verificou-se que os itens do questionário apresentam uma boa consistência interna. 
+
+## 2.3 Avaliação da dimensionalidade
+
+Uma das suposições básicas dos modelos do TRI é a unidimensionalidade, que se refere à ideia de que há uma aptidão dominante (um fator ou traço latente dominante) responsável pelo desempenho de um indivíduo nos itens de um teste. É essa aptidão que o teste busca medir. Esse pré-requisito é crucial, pois, até o momento, o TRI ainda não dispõe de soluções adequadas para modelos multidimensionais. Para mais detalher, veja Pasquali & Primi (2009)[^3].
+
+Assim, uma análise de dimensionalidade é apresentada a seguir com o objetivo de verificar se o conjunto de questões do nosso estudo mede uma única característica, de modo a inferir se a saúde mental dos alunos de graduação é caracterizada por um único traço latente. Para isso, desenvolveremos uma análise fatorial usando o pacote *psych* e especificamente a função `fa` (Revelle, in preparation)[^12], que implementa uma análise fatorial exploratória utilizando o método MinRes (mínimo residual). Este método utiliza os Mínimos Quadrados Ordinários (OLS) para encontrar a solução residual mínima (minres), resultando em soluções muito semelhantes às obtidas pela máxima verossimilhança, mesmo para matrizes mal-comportadas. Ver Harman e Jones (1966)[^11].
+
+
+### 2.3.1 Análise fatorial utilizando matriz de correlação tetracórica
+
+Para avaliar a unidimensionalidade do teste, é realizada uma análise fatorial utilizando a matriz de correlações tetracóricas. Essa abordagem foi escolhida porque, ao utilizar testes ou escalas com respostas dicotômicas, como no nosso estudo, ou politômicas, a aplicação da matriz de correlação de Pearson tradicional para a análise fatorial não é válida. No caso de dados dicotômicos, devem ser consideradas correlações tetracóricas, enquanto para dados politômicos, devem ser utilizadas correlações policóricas, conforme discutido em Revelle (2022)[^15].
+
+Primeiramente, foi aplicado essa metodologia utilizando um único fator. Os resultados são apresentados a seguir:
+
+
+```{r}
+c<-ord2
+fap1 <- fa(r=c$rho)  #Análise fatorial utilizando a matriz de correlação tetracórica
+fap1
+```
+
+Na coluna MR1, são apresentadas as cargas fatoriais de cada item assumindo um único fator, indicando o quanto cada item contribui para o fator latente subjacente aos itens. Os valores na coluna $h2$ correspondem à quantidade de variância explicada pelo fator (retido) em cada item e representa a soma dos quadrados das cargas fatoriais, também conhecida como comunalidade. Enquanto que $u2 := 1 - h2$ representa a variância residual, também chamada de unicidade. Na coluna $com$ é apresentada a complexidade de Hoffman de cada item, que é igual a 1 se um item carrega apenas em um fator, 2 se carrega uniformemente em dois fatores, e assim por diante. Esse valor indica o quanto um item reflete um único construto, sendo menor para itens com cargas fatoriais relativamente baixas. Consulte Pettersson e Turkheimer (2010)[^13] para mais detalhes.
+
+
+Com os resultados obtidos, é possível verificar que as cargas fatoriais entre os itens e o fator está entre 0.46 e 0.82, o que indica que a associação entre as questões do teste e o fator é moderada ou forte. Também notamos que o índice de complexidade de todos os itens é igual a 1, sinalizando que uma única dimensão seria suficiente para explicar a variabilidade dos itens. Desse modo, há indícios de que os itens medem uma mesma característica.
+
+Analisando mais detalhadamente, temos que as questões 4 e 5 são as que menos se relacionam com o primeiro fator, com ambas apresentando um valor igual a 0.46. Esses itens se referem, respectivamente, a "Assusta-se com facilidade?" (SRQ04) e "Tem tremores nas mãos?" (SRQ05). Além disso, esses itens apresentam a menor comunalidade (0.21) e a maior variância residual (0.79), indicando que estes itens são os menos associados com o fator ou dimensão subjacente aos outros itens.
+
+Por outro lado, o item 9, "Tem se sentido triste ultimamente?" (SRQ09), apresenta um valor expressivo de carga fatorial igual a 0.82, indicando uma forte associação com o primeiro fator. Consequentemente, esse item possui a maior comunalidade (0.67) e a menor variância residual (0.33).
+
+No sumário, são apresentadas a soma dos quadrados das cargas fatoriais, bem como a proporção de variância, que indica quanto da variância total dos itens é explicada pelo fator.
+
+Neste caso, observa-se que o fator (uma dimensão) explica cerca de 44% da variabilidade dos dados, um valor relevante. Além disso, analisando outros resultados apresentados, encontramos uma correlação entre os escores e o fator de 0.97, um valor significativo e que reforça a sugestão de unidimensionalidade do teste.
+
+
+
+A seguir, é avaliada a possibilidade de o teste apresentar dois fatores, ou seja, de medir duas características distintas. Para isso, realizamos a mesma análise fatorial, desta vez considerando dois possíveis fatores, e apresentamos a solução utilizando a rotação *varimax*. Em seguida, será feita uma comparação entre os resultados obtidos com um único fator e com dois fatores. 
+
+Adicionalmente, o pacote *psych* apresenta os índices de ajuste no estilo de Modelagem de Equações Estruturais (*Structural Equation Modeling*, SEM), geralmente utilizados em análises fatoriais confirmatórias, e que, neste estudo, será utilizada para representar graficamente os resultados da análise fatorial exploratória de dois fatores. Mais informações podem ser encontradas na documentação do R com `?factor.stats`. 
+
+
+```{r}
+fap2 <- fa(r=c$rho,nfactors=2,rotate="varimax")
+fap2 
+
+```
+
+É possível verificar que as cargas fatoriais entre os itens e o primeiro fator variam entre 0.11 e 0.76, enquanto no segundo fator estão entre 0.14 e 0.91. Considerando cargas fatoriais superiores a 0.40, podemos afirmar que os itens 2, 3, e 9, 10, 11, 12, 13, 14, 15, 16 e 17 se associam com o fator 1, enquanto os itens 1, 4, 7 e 20 se associam com o fator 2. Ainda, os itens 6, 8, 18 e 19 estão associados com ambos os fatores, ao passo que o item 5 está associado a nenhum fator. Essa análise pode ser visualizada na figura que apresenta a solução de dois fatores.
+
+Assim como na solução de um fator, observamos que as menores comunalidades, e consequentemente as maiores variâncias residuais, ocorrem nos itens 4 e 5. Além disso, encontramos que a complexidade do item é igual a 2 para os itens 2, 6 e 18, o que justifica, possivelmente, uma solução de dois fatores para esses itens. No entanto, como a média da complexidade dos itens é 1.5, concluímos que, de maneira geral, não é viável uma solução de dois fatores.
+
+
+Analisando os resultados de forma geral, temos que o primeiro fator explica 31% da variância dos dados, enquanto o segundo fator explica 20%. Assim, em conjunto os fatores explicam cerca de 50% da variância dos dados, um valor que não se distância significativamente de 44%, valor obtido anteriormente com a análise fatorial de fator único. 
+
+Na solução de dois fatores, o fator 1 apresenta uma correlação entre os escores e o fator igual a 0.95, enquanto o fator 2 apresenta correlação igual a 0.94, valores que são relevantes, porém menores que o valor de 0.97 encontrado na análise de fator único. Além disso, observa-se que o valor de RMSR é 0.05, um pouco inferior ao valor de 0.08 obtido na solução de um único fator. 
+
+
+Na seguinte figura, é mostrado graficamente a solução de dois fatores.
+
+```{r}
+par(mfrow=c(1,2))
+fa.diagram(fap2,cut=0.4)
+factor.plot(fap2, cut=0.4,ylim=c(0,1),xlim=c(0,1))
+abline(h=0.4,col=4,lty=2)
+abline(v=0.4,col=4,lty=2)
+```
+
+
+Em geral, podemos observar que a solução de dois fatores não parece ser suficientemente convincente quando comparada com a solução de um único fator. Isso se deve ao fato de que o possível segundo fator está formado por poucos itens, e o item 5 não se encaixaria em nenhum dos fatores.
+
+Além da análise estatística, Bazán (2022)[^14] enfatiza que, dado que a unidimensionalidade é a suposição central em modelos baseados na Teoria de Resposta ao Item (TRI), a decisão sobre a violação dessa suposição não deve ser feita com base em um único critério. Pelo contrário, é crucial levar em conta múltiplos critérios ao avaliar a unidimensionalidade. Alguns autores defendem que um modelo pode ser considerado unidimensional quando pelo menos um desses critérios é atendido, enquanto é classificado como multidimensional quando vários critérios de unidimensionalidade são simultaneamente violados.
+
+Além disso, Bazán (2022) aponta que a análise fatorial pode indicar a presença de um ou mais fatores, mas a existência de mais de um fator não implica necessariamente que o teste seja multidimensional. Nesse contexto, a literatura sugere que um teste é considerado unidimensional se ao menos dois dos três seguintes critérios forem atendidos:
+
+- O primeiro fator explica pelo menos 40% da variância (Carmines & Zeller, 1979);
+- O número de itens com cargas fatoriais superiores a 0,35 no primeiro fator deve ser superior a 80% (Orlando et al., 2000);
+- A raiz do erro quadrático médio (Root Mean Square Residual, RMSR) deve ser próxima de 0.
+
+Considerando esses critérios, observamos que a solução de um fator satisfaz os dois primeiros critérios, enquanto a solução de dois fatores atende apenas ao último critério.
+
+Portanto, considerando as análises realizadas, temos que os dados fornecem evidências de que o questionário SRQ20 é unidimensional, desse modo, o teste mede um único traço latente dos indivíduos.
+
+
+
+# 3 Teoria de Resposta ao Item (TRI)
+
+A Teoria de Resposta ao Item (TRI), também conhecida como modelo de resposta ao item na Psicometria, apresenta como principal interesse
+saber se um indivíduo assinala um determinado item (correto ou não) em um teste, ao invés de considerar apenas a sua pontuação total. A TRI tem o interesse em determinar como a variável latente de um indivíduo (como habilidade, conhecimento, aptidão ou proficiência) está relacionada com as respostas dadas nos itens de um teste. Isso é feito por meio de modelos probabilísticos, que tentam descrever a relação entre esse traço latente e a probabilidade de uma pessoa responder corretamente a um item (Bazán 2018). Em outras palavras, o modelo tenta explicar como algo não diretamente mensurável (traço latente) influencia o que pode ser medido ou observado (respostas do teste). Ainda, o TRI diz que a relação entre o desempenho no item e o conjunto dos traços latentes pode ser descrita pela equação monotônica Curva Característica do Item (CCI), na qual indivíduos de maior proficiência terão maior probabilidade de responder corretamente o item (Pasquali & Primi 2009). 
+
+
+
+## 3.1 Modelo Geral TRI
+
+Utilizando a definição de Bazán et al. (2010)[^6], considere \(n\) sujeitos avaliados em um teste com \(k\) itens. Um modelo da Teoria de Resposta ao Item (TRI), ou simplesmente modelo TRI, binário unidimensional (2L), é um sistema no qual, para cada sujeito \(i\), tem-se um modelo de variável latente monotônico unidimensional \(\left(\mathbf{Y}, \theta_i\right)\), definido pelas expressões:
+
+$$
+\begin{gathered}
+Y_{ij} \mid \theta_i, \eta_j \sim \operatorname{Bernoulli}\left(p_{ij}\right) \\
+p_{ij} = P\left(Y_{ij} = 1 \mid \theta_i, \eta_j\right) = F\left(m_{ij}\right) \\
+m_{ij} = a_j\left(\theta_i - b_j\right), \\
+i = 1, \ldots, n, \; j = 1, \ldots, k
+\end{gathered}
+$$
+
+onde:
+
+- \( Y_{ij} \) é a variável manifesta que modela a resposta binária do sujeito \(i\) ao item \(j\).
+- \( \eta_j = (a_j, b_j) \) são os parâmetros que representam, respectivamente, a discriminação (\(a_j\)) e a dificuldade (\(b_j\)) do item \(j\).
+- \(\theta_i\) é o valor da variável latente para o sujeito \(i\), interpretada como a habilidade do sujeito \(i\).
+- \( p_{ij} \) é a probabilidade condicional, dada \(\theta_i\).
+- \( F \) é denominada a curva característica do item (CCI).
+- \( m_{ij} \) é um preditor latente linear em relação à habilidade do sujeito \(i\).
+
+
+Em um modelo TRI binário, a densidade conjunta do vetor de respostas multivariadas \(\boldsymbol{Y} = \left(\boldsymbol{Y}_1, \ldots, \boldsymbol{Y}_n\right)^{\prime}\), com \(\boldsymbol{Y}_{\boldsymbol{i}} = \left(Y_{i1}, \ldots, Y_{ik}\right)\), dado o vetor de variáveis latentes \(\boldsymbol{\theta} = \left(\theta_1, \ldots, \theta_n\right)^{\prime}\) e o vetor de parâmetros dos itens \(\boldsymbol{\eta} = \left(\eta_1, \ldots, \eta_k\right)^{\prime}\), pode ser escrita como:
+
+$$
+f(\boldsymbol{y} \mid \boldsymbol{\theta}, \boldsymbol{\eta}) = \prod_{i=1}^n \prod_{j=1}^k F\left(m_{ij}\right)^{y_{ij}}\left(1-F\left(m_{ij}\right)\right)^{1-y_{ij}}
+$$
+em que \(\theta_i\) representa o valor da variável latente para o indivíduo \(i\), sendo um escore originalmente expresso em valores contínuos em uma escala aproximada de -3 a +3.
+
+Neste estudo, podemos interpretar o escore \(\theta_i\) como uma medida do sofrimento mental. O parâmetro de dificuldade \(b_j\) reflete a severidade do sintoma abordado pelo item \(j\), enquanto o parâmetro de discriminação \(a_j\) indica a capacidade do item \(j\) de diferenciar respondentes com diferentes níveis de sofrimento mental. 
+
+
+## 3.2 Casos Particulares 
+
+O modelo geral admite diversas formulações, que dependem basicamente de como a CCI é considerada. Na sua versão mais simples, podemos tomar \(a_j = 1\) e considerar uma CCI da forma:
+
+$$
+P\left(Y_{ij} = 1 \mid \theta_i, b_j\right) = F\left(\theta_i - b_j\right)
+$$
+
+Este é chamado de modelo TRI de um parâmetro (1L).
+
+De forma mais geral, podemos considerar uma CCI da forma:
+
+$$
+P\left(Y_{ij} = 1 \mid \theta_i, a_j, b_j, c_j\right) = c_j + \left(1 - c_j\right) F\left(a_j\left(\theta_i - b_j\right)\right)
+$$
+
+onde o parâmetro \(c_j \in [0, 1]\) (também representado como \(g_j]\), conhecido como parâmetro de *guessing*), representa a probabilidade de um indivíduo acertar ou endossar um item \(j\) por acaso, e \(F\) é uma função de distribuição. Este é conhecido como o modelo TRI de três parâmetros (3L). Se considerarmos \(c_j = 0\), o modelo se reduz ao modelo TRI de dois parâmetros (2L). Adicionalmente, se assumirmos \(a_j = 1\), obtemos
+o modelo TRI de um parâmetro (1L), previamente apresentado. 
+
+## 3.3 Aplicação dos modelos TRI 1L, 2L e 3L
+
+Como dito anteriormente, os modelos de teoria de resposta (TRI) têm como suposição a unidimensionalidade dos itens. Dessa forma, como o questionário foi considerado unidimensional, podemos aplicar os modelos TRI de um parâmetro (1L), dois parâmetros (2L) e três parâmetros (3L).
+
+
+### 3.3.1 Modelo 1L
+
+Primeiramente ajustamos o modelo 1L usando o pacote *mirt*.
+
+```{r, results="hide"}
+#Estimation One Logistic IRT Model 1L usando mirt
+model1L <- mirt(df_srq,model = 1, itemtype = "Rasch", SE = TRUE)
+
+```
+
+```{r}
+print(model1L)
+```
+
+
+Inicialmente, são apresentadas as estatísticas de ajuste do modelo, que corresponde a uma análise fatorial de itens com informação completa, utilizando o algoritmo EM para estimar os parâmetros dos itens, assumindo normalidade para o traço latente. São fornecidos detalhes sobre a convergência do modelo (convergiu dentro da tolerância de \( 1 \times 10^{-4} \)), o procedimento de aceleração do algoritmo EM (16 iterações), o número de pontos de quadratura usados para obter a verossimilhança marginal integrando sobre o traço latente (61), o método empregado para estimar a matriz de informação (Oakes), além do valor da verossimilhança (-8803.857). 
+
+Também são reportados o número de parâmetros estimados (21), bem como as estatísticas de comparação de modelos: AIC (Akaike Information Criterion), BIC (Bayesian Information Criterion), G2 (Goodness-of-Fit Chi-Square) e RMSEA (Root Mean Square Error of Approximation, ou Erro Quadrático Médio da Aproximação), com os respectivos valores de 17649.71, 17748.69, 6902.06 e 0.
+
+Essas medidas também serão apresentadas para os demais modelos.
+
+A seguir, as estimativas dos parâmetros dos itens.
+
+
+```{r}
+coef(model1L,simplify = TRUE, IRTpar = TRUE)$items
+```
+
+
+Neste modelo, como \(a_j = 1\), este parâmetro não é estimado, sendo estimados os parâmetros \(b_j\), que correspondem à dificuldade do item. Note também que os valores \(g_j = 0\) e \(u_j = 1\) são apresentados. O parâmetro \(g\), denominado *guessing* no pacote *mirt*, corresponde ao parâmetro \(c\) definido anteriormente, que para o modelo 1L é igual a 0. O outro parâmetro, \(u\), está relacionado com a assíntota superior da curva da CCI. Nos modelos 1L, 2L e 3L, o valor de \(u\) é igual a 1, o que indica que a probabilidade de responder corretamente a qualquer item pode atingir 1. Para mais detalhes sobre o pacote *mirt*, consulte Chalmers (2012)[^8].
+
+A seguir, utilizamos um segundo pacote para estimar o modelo 1L: o pacote *ltm* (Rizopoulos, 2006)[^9], que realiza a estimativa dos parâmetros dos itens por meio de máxima verossimilhança marginal utilizando o algoritmo EM, com pontos de quadratura Gauss-Hermite.
+
+
+```{r}
+#Estimation One Logistic IRT Model 1L usando ltm
+fit1L <- ltm::rasch(df_srq, IRT.param = TRUE)
+summary(fit1L)
+```
+
+Embora a formulação padrão do modelo *Rasch* assuma que o parâmetro de discriminação seja fixado em 1, a função `rasch()` o estima. Para obter valores equivalentes às estimativas das dificuldades obtidas pelo *mirt*, deve-se multiplicar o valor estimado da discriminação, que neste caso é \(a = 1.481\), pelo valor estimado da dificuldade. Por exemplo, a dificuldade estimada no *ltm* para o item 1 é \(1.481 \times 0.265 = 0.392\), o que é próximo do valor da dificuldade estimada para o item 1 no *mirt*, que é \(0.387\).
+
+
+As diferenças entre os valores estimados devem-se aos diferentes métodos utilizados no processo de otimização e convergência. Para mais detalhes, consulte Rizopoulos e Moustaki (2008)[^10].
+
+Esse mesmo resultado, porém com o sinal invertido, pode ser obtido a seguir.
+
+
+```{r}
+fit1La<- ltm::rasch(df_srq, IRT.param = FALSE)
+summary(fit1La)
+```
+
+O resultado mostra os valores estimados do parâmetro de dificuldade com sinal modificado.
+
+Outra possibilidade recomendada na documentação da função *ltm* é usar um contraste, de modo a assumir que a discriminação é igual a 1. Essa abordagem é apresentada a seguir.
+
+
+```{r}
+fit1Lb=rasch(df_srq,constraint=cbind(length(df_srq)+1,1))
+summary(fit1Lb)
+```
+
+O resultado mostra que os valores estimados para o parâmetro de dificuldade são semelhantes aos obtidos pelo *mirt*, porém com diferenças em algumas casas decimais. Considerando essas variações na forma de apresentar os resultados no *ltm*, preferimos basear nossas interpretações na saída do *mirt*.
+
+
+
+Ao ajustar o modelo 1L, observa-se que as estimativas dos parâmetros de dificuldade ($b$) das questões do questionário SQR usando *mirt* variaram de -2.480 a 2.007, correspondendo, respectivamente, aos itens 6 e 17. Em geral, podemos pensar que o parâmetro de dificuldade se refere ao grau de severidade do sintoma, quando negativo significa que o sintoma é menos severo e quanto mais positivo significa que o sintoma e mais severo.
+Assim, o item 6, que trata da questão "Sente-se nervoso(a), tenso(a) ou preocupado(a)?" (SRQ06), representa um sintoma de menor severidade entre os estudantes. Em contraste, o item 17, que aborda a questão "Tem tido ideia de acabar com a vida?" (SRQ17), reflete o sintoma de maior severidade.
+
+
+
+### 3.3.2 Modelo 2L
+No modelo 2L, além do parâmetro de dificuldade ($b$) também existe o parâmetro discriminação ($a$). O parâmetro de discriminação ($a>0$) mede a eficácia de um item em diferenciar respondentes com diferentes níveis do traço latente avaliado pela questão. 
+
+
+A seguir usamos o *mirt* para ajustar o modelo de três parâmetros.
+
+```{r, results="hide"}
+#Estimation two Logistic IRT Model 2L usando mirt
+model2L<- mirt(df_srq, itemtype = "2PL", SE = TRUE)
+```
+
+```{r}
+print(model2L)
+```
+
+```{r}
+coef(model2L,simplify = TRUE, IRTpar = TRUE)$items
+```
+
+Os resultados apresentam as estimativas dos parâmetros de discriminação e dificuldade.
+
+Adicionalmente, as estimativas também podem ser obtidas utilizando o *ltm*, como mostrado a seguir.
+
+```{r}
+#Estimation two Logistic IRT Model 2L usando ltm
+fit2L=ltm(df_srq~z1,IRT.param=TRUE)
+summary(fit2L)
+```
+
+Neste caso, ambos pacotes fornecem estimativas similares. Novamente, iremos basear nossas interpretações na saída do *mirt*.
+
+Encontramos que as estimativas dos parâmetros de dificuldade ($b$) do SQR-20 estão entre -1.3737 e 1.2354, que correspondem aos mesmos itens do modelo 1L, 6 e 17, respectivamente, possuindo a mesma interpretação.
+
+Já, para o parâmetro de discriminação ($a$), que avaliam quão bem uma questão discrimina (ou diferencia) entre indivíduos com pontuação alta e baixa do sofrimento mental, encontramos os valores entre 0.8328 e 2.5284, referente às questões 4 ("Assusta-se com facilidade?" (SRQ04)) e 9 ("Tem se sentido triste ultimamente?" (SRQ09)), respectivamente. Logo, os itens 4 e 9 podem ser considerados as perguntas menos e mais significativas do questionário para a identificação da gravidade do estado de saúde mental dos indivíduos.
+
+
+## 3.3.3 Modelo 3L
+
+No modelo 3L, além dos parâmetros de dificuldade ($b$) e discriminação ($a$), há a inclusão do parâmetro de pseudochute ($c$), que representa a probabilidade de um respondente acertar ou endossar um item por acaso, especialmente quando não possui o traço latente avaliado pela questão. Vale lembrar que o parâmetro ($g$) no pacote *mirt*, denominado *guessing*, corresponde ao parâmetro de pseudochute ($c$).
+
+
+```{r, results="hide"}
+#Estimation three Logistic IRT Model 3L usando mirt
+#model3L <- mirt.model("rotation = 1 - 20")
+#model3L.result <- mirt::mirt(df_srq,model3L, itemtype = "3PL", SE = TRUE)
+model3L<- mirt(df_srq, itemtype = "3PL", SE = TRUE)
+```
+
+```{r}
+print(model3L)
+```
+
+```{r}
+coef(model3L,simplify = TRUE, IRTpar = TRUE)$items
+```
+
+Os resultados apresentam as estimativas dos parâmetros de discriminação, dificuldade e pseudochute.
+
+Essas estimativas também podem ser obtidas utilizando o pacote *ltm*, como apresentado a seguir.
+
+
+```{r}
+#Estimation three Logistic IRT Model 3L usando ltm
+fit3L=tpm(df_srq,type="latent.trait",IRT.param=TRUE,max.guessing=1)
+summary(fit3L)
+```
+
+Neste caso, ambos os pacotes fornecem estimativas semelhantes. No entanto, para alguns itens e parâmetros, o pacote *ltm* não calcula as estimativas dos desvios padrão. Novamente, iremos basear nossas interpretações na saída do *mirt* .
+
+Por fim, para o modelo 3L temos que os valores de discriminação ($a$) estão entre 0.8406 e 2.5220, correspondendo, respectivamente, às questões 4, "Assusta-se com facilidade?" (SRQ04), e 9, "Tem se sentido triste ultimamente?" (SRQ09). Logo, a questão 4 é o sintoma menos severo entre os estudantes de graduação, enquanto a questão 9 é o mais severo.
+
+Sobre o parâmetro de dificuldade ($b$), os valores se encontram entre -1.3772 e 1.2297, que correspondem, respectivamente, aos itens 6 e 17, assim como nos modelos 1L e 2L, possuindo a mesma interpretação.
+
+Os valores do parâmetro $g$ foram muito próximos de zero, com exceção dos items 1 (Você tem dores de cabeça frequentes? (SRQ01)) e 12 (Tem dificuldade para tomar decisões? (SRQ12)), que possuem valores ligeiramente mais elevados. Isso sugere que, em geral, as respostas dos estudantes não apresentam evidências significativas do comportamento de pseudochute. 
+
+## 3.4 Escolha do modelo
+
+A seguir, desenvolvemos um teste ANOVA para escolher o melhor modelo para os dados.
+
+
+```{r}
+#Estimation three Logistic IRT Model 3L usando ltm
+anova(fit1L,fit2L)
+anova(fit2L,fit3L)
+mirt::anova(model1L,model2L,model3L)
+```
+
+Os resultados indicam que há uma diferença significativa entre os modelos 1L e 2L. Contudo, os modelos 2L e 3L não apresentam diferenças estatisticamente significativas.
+
+Com base nos valores do AIC e BIC, optamos pelo modelo 2L, pois ele apresenta os menores valores para essas métricas, indicando melhor ajuste aos dados.
+
+
+
+# 4 Resultados do modelo escolhido
+
+Para as seguintes etapas das análises, é mostrado os resultados obtidos usando o modelo 2L.
+
+```{r}
+coef <- coef(model2L,simplify = TRUE, IRTpar = TRUE)$items
+
+x <- coef[, 2]
+y <- coef[, 1]
+z <- 1:20
+
+df <- data.frame(x = x, y = y, z = as.character(z))
+
+scatter_plot <- ggplot(df, aes(x = x, y = y, label = z)) +
+  geom_point() +
+  geom_text(size = 3, vjust = 1.5) +  # Adicionando os números de z aos pontos
+  labs(x = "Dificuldade (b)", y = "Discriminação (a)", title = "Diagrama de Dispersão") +
+  theme_minimal()
+
+print(scatter_plot)
+```
+
+No diagrama de dispersão apresentado, temos as questões distribuídas pelos valores de dificuldade e discriminação estimados usando mirt.
+
+Pelo gráfico conseguimos ver que os itens de maior dificuldade, ou seja, possuem maior grau de gravidade são as questões 17 ("Tem tido ideia de acabar com a vida?") e 5 ("Tem tremores nas mãos?"). Os menos severos são os itens 6 ("Sente-se nervoso(a), tenso(a) ou preocupado(a)?") e 19 ("Você se cansa com facilidade?").
+
+Os itens mais discriminantes (significativos) são 6 ("Sente-se nervoso(a), tenso(a) ou preocupado(a)?") e 9 ("Tem se sentido triste ultimamente?"). Os menos significativos são 4 ("Assusta-se com facilidade?") e 5 ("Tem tremores nas mãos?"). Dessa forma, vemos que as questões mais ligadas ao aspecto emocional apresentam uma significância maior em comparação com as de caráter físico.
+
+
+# 5 Estimação do Traço Latente
+
+Agora, estimamos os traços latentes subjacentes aos padrões de resposta.
+
+Primeiramente, apresentamos a distribuição dos escores no SRQ-20, ou seja, a quantidade de indivíduos que responderam "sim" a nenhuma das questões, a uma questão, a duas questões, e assim sucessivamente, até aqueles que responderam "sim" a todas as questões.
+
+```{r}
+#escores
+score<- rowSums(df1[,c(2:21)])
+table(score)
+```
+
+Podemos observar que a maioria dos estudantes responde de maneira equilibrada às questões com "sim" e "não", uma vez que a quantidade de pessoas está mais concentrada entre 6 e 14 respostas afirmativas. Isso indica que a maioria dos respondentes apresenta um padrão de respostas misto, sem uma predominância de respostas afirmativas ou negativas, sugerindo que os sintomas avaliados pelo SRQ-20 não são tão frequentes ou graves para a maioria dos estudantes. Entretanto, é importante levar em consideração que 11 estudantes responderam "sim" para todas as 20 questões do questionário, indicando que esses indivíduos podem estar apresentando um quadro mais acentuado de sintomas relacionados à saúde mental, conforme avaliado pelo SRQ-20. Ainda, temos que 18 pessoas responderam "não" para todas as questões.
+
+São apresentadas a seguir algumas estatísticas desses escores.
+
+```{r}
+#Estatístivas dos escores
+describe(score)
+```
+
+Analisando esses dados, vemos que o escore de ratreo de sofrimento mental usando TCT possui uma distribuição simétrica, conforme evidenciado pela média (9.94) e mediana (10) muito próximas, além da assimetria próxima de zero (-0.05). O desvio padrão (5.06) e a MAD (5.93) mostram que há uma dispersão significativa dos valores em torno da média. A curtose negativa (-0.88) sugere uma distribuição mais achatada e com caudas mais finas do que a normal.
+Com uma amostra grande (823) e um pequeno erro padrão (0.18), a média pode ser considerada como uma estimativa confiável.
+
+Portanto, os dados têm uma distribuição simétrica e moderadamente dispersa.
+
+
+Agora, estimamos os escores de ratreio de sofrimento mental usando TRI assim os traços latentes considerando o modelo TRI e uma escala de média 50 e desvio padrão 10.
+
+```{r}
+#escores tri
+fullscores <- fscores(model2L, method='MAP')
+escoretri=fullscores*10+50
+describe(escoretri)
+```
+
+As estatísticas sobre o score TRI indicam que a distribuição é bastante simétrica e moderadamente dispersa. A média (49.94) e a mediana (49.79) são muito próximas, o que sugere a simetria, corroborada pela assimetria quase nula (0.01). O desvio padrão (8.94) e a MAD (9.24) apontam para uma dispersão moderada dos dados. A curtose negativa (-0.41) indica uma distribuição levemente mais achatada que a normal. Com um tamanho de amostra grande (823) e um erro padrão pequeno (0.31), a média estimada é confiável e precisa.
+
+Na seguinte figura mostramos o grau de correlação entre os escores e os escores TRI, além do Teste de Correlação de Pearson.
+
+```{r}
+#Correlação escores e escores tri
+cor(score, fullscores)
+```
+
+```{r}
+#Teste de Correlação de Pearson
+cor.test(score, fullscores,
+         method="pearson",
+         alternative="two.sided",
+         conf.level = 0.95)
+```
+
+```{r}
+plot(score, fullscores, 
+     xlab = "Score SRQ",
+     ylab = "Score TRI",  
+     main = "Relação entre Score SRQ e Score TRI")
+```
+
+
+Em resumo, a correlação entre o score SRQ-20 e o score obtido usando TRI é 0.989168, o que é evidenciado pelo gráfico entre elas, que revela uma forte relação linear positiva, indicando que as duas variáveis são altamente correlacionadas. Com o teste de Pearson, obtemos um p-valor próximo de zero (p-value < $2.2 \times 10^{-16}$) e menor que o nível de significância de 5%, o que indica que a correlação é estatisticamente significativa, ou seja, a correlação é de fato diferente de zero. Isso sugere que existe uma relação linear significativa entre as variáveis analisadas.
+
+De acordo com os resultados e o gráfico, para um determinado escore obtido ao somar as respostas "sim" do teste, podemos obter diferentes valores nas estimativas do traço latente dos avaliados.
+
+
+## 5.1 Avaliação da Normalidade dos escores TRI
+
+A seguir, apresentamos algumas descrições adicionais usando uma escala transformada.
+
+```{r}
+shapiro.test(escoretri)
+qqnorm(escoretri)
+head(escoretri)
+library(ggpubr)
+ggdensity(escoretri[,1])
+ggqqplot(escoretri[,1])
+```
+
+O resultado do teste de normalidade de Shapiro-Wilk indica que a distribuição dos dados do escore TRI difere significativamente de uma distribuição normal, uma vez que o p-valor obtido é próximo de zero e menor que o nível de significância de 5%. Isso sugere que os dados não são normalmente distribuídos, o que pode ser notado pelos gráficos acima.
+
+O gráfico Q-Q Plot apresenta um desvio significativo nas extremidades, afastando-se da linha diagonal. O gráfico de densidade mostra assimetrias em sua curva e não segue a forma da distribuição normal. Por fim, o gráfico de envelope exibe pontos fora de seus limites, indicando que os dados não seguem uma distribuição normal.
+
+
+Finalmente, os resultados dos escores TRI são salvos na base de dados a seguir.
+
+```{r}
+#Adiciona a nova coluna scoreTRI ao dataframe
+escoretri<-as.data.frame(escoretri)
+df1$scoreTRI <- escoretri$F1
+
+#Salva o dataframe no arquivo Excel
+write.xlsx(df1, "DadosNotebookTRI.xlsx")
+
+head(df1)
+```
+
+
+# 6 Considerações Finais
+
+A análise psicométrica da escala SRQ-20 realizada neste estudo evidenciou que o teste é confiável e unidimensional, permitindo a aplicação tanto da Teoria Clássica dos Testes (TCT), como da Teoria da Resposta ao Item (TRI) para estimar os escores de transtornos mentais comuns (TMC) e medir o sofrimento mental dos alunos de graduação da USP São Carlos. O modelo de dois parâmetros da TRI foi considerado o mais adequado para a obtenção dos resultados. A partir desse modelo, foi possível a compreensão da gravidade dos sintomas avaliados e da capacidade discriminativa de cada item. De maneira geral, verificou-se que as questões mais relacionadas ao aspecto emocional são mais significativas para indicar algum sofrimento mental em comparação com as questões de caráter físico. Esses resultados mostram que o SRQ-20 é uma ferramenta importante e capaz de auxiliar na avaliação da saúde mental dos estudantes, com base em suas respostas no questionário.
+
+<!-- # 7 Referências -->
+
+[^1]: Sartes, L. M. A. & Souza-Formigoni, M. L. O. (2013). Avanços na Psicometria: Da Teoria Clássica dos Testes à Teoria de Resposta ao Item. Disponível em https://doi.org/10.1590/S0102-79722013000200004
+
+[^2]: Bazán Guzmán, J. L. (2018). Psicometria e avaliação por testes: um marco metodológico. In Avaliação da educação : referências para uma primeira conversa. São Carlos, SP: EdUFSCar. Disponível em https://edisciplinas.usp.br/pluginfile.php/7888277/mod_resource/content/2/Bazan2018.pdf
+
+[^3]: Pasquali, Luiz, & Primi, Ricardo. (2003). Fundamentos da teoria da resposta ao item: TRI. Avaliação Psicológica, 2(2), 99-110. Disponível em http://pepsic.bvsalud.org/scielo.php?script=sci_arttext&pid=S1677-04712003000200002&lng=pt&tlng=pt
+
+[^4]: Gadermann, A., Guhn, M. and Zumbo, B. (2012) Estimating Ordinal Reliability for Likert-Type and Ordinal Item Response Data: A Conceptual, Empirical, and Practical Guide. Practical Assessment, Research & Evaluation, 17, 1-13. Disponível em https://files.eric.ed.gov/fulltext/EJ977577.pdf
+
+[^17]: Zumbo, Bruno D.; Gadermann, Anne M.; and Zeisser, Cornelia (2007) "Ordinal Versions of Coefficients Alpha and Theta for Likert Rating Scales," Journal of Modern Applied Statistical Methods: Vol. 6 : Iss. 1 , Article 4. DOI: 10.22237/jmasm/1177992180 Disponível em: http://digitalcommons.wayne.edu/jmasm/vol6/iss1/4
+
+[^5]: Material preparado pelo Prof. Dr. César Gonçalves de Lima – FZEA/USP. Disponível em https://edisciplinas.usp.br/pluginfile.php/8009978/mod_resource/content/2/GIA5005%20%2811%29%20-%20An%C3%A1lise%20de%20itens%20%28alfa%20de%20Cronbach%29.pdf
+
+[^6]: Bazán Guzmán, J. L., Valdivieso Serrano, L. H., & Calderón García, A. (2010). Enfoque Bayesiano en modelos de teoría de respuesta al ítem. Disponível em http://argos.pucp.edu.pe/~jlbazan/download/Reportef27.pdf
+
+[^7]: Silveira, L. B., Kroeff, C. da R., Teixeira, M. A. P., & Bandeira, D. R. (2022). Uso do Self-Reporting Questionnaire (SRQ-20) para identificação de grupo clínico e predição de risco de suicídio. Revista Psicologia E Saúde, 13(4), 49–61. Disponível em https://doi.org/10.20435/pssa.v13i4.1219
+
+
+[^8]:Chalmers, R., P. (2012). mirt: A Multidimensional Item Response Theory Package for the R Environment. Journal of Statistical Software, 48(6), 1-29. doi: 10.18637/jss.v048.i06
+
+
+[^9]:Rizopoulos, D. (2006) ltm: An R package for latent variable modelling and item response theory analyses. Journal of Statistical Software, 17(5), 1–25. URL doi: 10.18637/jss.v017.i05
+
+[^10]:Rizopoulos, D. and Moustaki, I. (2008) Generalized latent variable models with nonlinear effects. British Journal of Mathematical and Statistical Psychology, 61, 415–438.
+
+[^11]:Harman, Harry and Jones, Wayne (1966) Factor analysis by minimizing residuals (minres), Psychometrika, 31, 3, 351-368.
+
+[^12]: Revelle, W. (in preparation) An Introduction to Psychometric Theory with applications in R. Springer. Disponível em https://personality-project.org/r/book/
+
+[^13]: Pettersson, E. and Turkheimer, E. (2010). Item selection, evaluation, and simple structure in personality data. Journal of Research in Personality, 44(4), 407–420. Disponível em https://doi.org/10.1016/j.jrp.2010.03.002
+
+[^14]: Bazán, J. (2022). Una metodología para el Análisis de Unidimensionalidad de unaPrueba. Nota Técnica. Disponível em https://jorgeluisbazan.weebly.com/uploads/1/2/5/6/125695412/metodosanalisisunidimensionalidadv1.pdf
+
+[^15]: Revelle, W. (2022) How To: Use the psych package for Factor Analysis and data reduction.
+Disponível em https://cran.r-project.org/web/packages/psychTools/vignettes/factor.pdf
+
+[^16]: Wright, B. D., & Stone, M. H. (1979). Best test design. Mesa Press.
