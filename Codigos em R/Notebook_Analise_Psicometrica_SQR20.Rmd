@@ -47,12 +47,14 @@ Questionários desenvolvidos pelo GAPSI e pelo Apoia USP foram aplicados nos ano
 Instalação dos pacotes que serão usados para analisar os dados:
 
 ```{r  echo=TRUE,comment = NA, message=FALSE,warning = FALSE}
-# install.packages("ltm")
-# install.packages("psych")
+# install.packages("ggplot2")
 # install.packages("readxl")
 # install.packages("foreign")
+# install.packages("ltm")
+# install.packages("mirt")
+# install.packages("psych")
 # install.packages("psychometric")
-# install.packages("rtools")
+# install.packages("irtoys")
 # install.packages("mirtCAT")
 # install.packages("openxlsx")
 
