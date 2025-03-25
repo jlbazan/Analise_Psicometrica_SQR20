@@ -20,7 +20,7 @@ spondentes com diferentes níveis de sofrimento mental avaliado. Uma avaliação
  
 ## Instalação dos pacotes do R
 
-Antes de rodar os códigos em sua máquina, garanta que os pacotes necessários do R estão devidammente instalados. Para instalar os pacotes, rode o seguinte código no seu ambiente R:
+Antes de rodar os códigos em sua máquina, garanta que os pacotes necessários do R estão devidamente instalados. Para instalar os pacotes, rode o seguinte código no seu ambiente R:
 
 ```
 install.packages("ggplot2") 
