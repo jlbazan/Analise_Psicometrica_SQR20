@@ -1,6 +1,6 @@
 # Dados
 
-Nesta pasta, é possivel encontrar os dados utilizados no notebook da análise psicométrica (presente na pasta "Codigos em R"). O conjunto de dados contém 20 variáveis dicotômicas (“sim” e “não”) relacionadas aos itens do SRQ-20. Essas informações foram obtidas por meio de formulários aplicados em 2021, 2022 e 2023, pela GAPSI e Apoia USP, que são serviços de apoio psicossocial à saúde mental da comunidade universitária da USP, campus de São Carlos. As perguntas incluídas nos questionários são descritas a seguir:
+Nesta pasta, é possivel encontrar os dados utilizados no notebook da análise psicométrica (presente na pasta "Codigos em R", deste repositório). O conjunto de dados contém 20 variáveis dicotômicas (“sim” e “não”) relacionadas aos itens do SRQ-20. Essas informações foram obtidas por meio de formulários aplicados em 2021, 2022 e 2023, pela GAPSI e Apoia USP, que são serviços de apoio psicossocial à saúde mental da comunidade universitária da USP, campus de São Carlos. As perguntas incluídas nos questionários são descritas a seguir:
 
 * I01: Você tem dores de cabeça frequentes?
 * I02: Tem falta de apetite?
