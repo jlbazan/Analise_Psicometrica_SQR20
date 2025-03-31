@@ -1,4 +1,4 @@
-# Análise Psicométrica SQR20
+# Análise Psicométrica SQR-20
 
 ## Resumo
  Neste notebook, é realizada uma análise psicométrica da escala de rastreamento SRQ-20, composta por vinte
