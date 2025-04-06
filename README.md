@@ -1,4 +1,15 @@
-# Análise Psicométrica SQR-20
+# Análise Psicométrica da escala de rastreio SQR-20 usando dados do GAPSI e Apoia USP
+
+**Gabriela Amaral<sup>1</sup>, Brunna Quatrochi<sup>1</sup>, Jorge L. Bazán <sup>2</sup> and Emanuela Pap da Silva <sup>3</sup>**
+
+<sup>1</sup>Departamento de Matemática Aplicada e Estatística,
+<sup>2</sup>Bacharelado em Estatística e Ciencia de Dados,
+<sup>3</sup>Serviço de Promoção Social
+Universidade de São Paulo, São Carlos, Brasil
+
+
+**Autor de contato:** Jorge L. Bazán, jlbazan@icmc.usp.br
+
 
 ## Resumo
  Neste notebook, é realizada uma análise psicométrica da escala de rastreamento SRQ-20, composta por vinte
