@@ -3,8 +3,8 @@ title: "Análise Psicométrica da escala de rastreio SQR-20 usando dados do GAPS
   Apoia USP"
 author:
 - Gabriela Amaral (gabrielajj.ga@usp.br)
-- Jorge Luis Bazán (jlbazan@icmc.usp.br)
 - Brunna Quatrochi (brunnaquatrochi@usp.br)
+- Jorge Luis Bazán (jlbazan@icmc.usp.br)
 - Emanuela Pap da Silva (emanuela@sc.usp.br)
 output:
   word_document: default
