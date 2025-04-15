@@ -7,8 +7,8 @@ author:
 - Jorge Luis Bazán (jlbazan@icmc.usp.br)
 - Emanuela Pap da Silva (emanuela@sc.usp.br)
 output:
-  word_document: default
   html_document: default
+  word_document: default
   pdf_document: default
 ---
 
@@ -667,7 +667,7 @@ head(df1)
 
 A análise psicométrica da escala SRQ-20 realizada neste estudo evidenciou que o teste é confiável e unidimensional, permitindo a aplicação tanto da Teoria Clássica dos Testes (TCT), como da Teoria da Resposta ao Item (TRI) para estimar os escores de transtornos mentais comuns (TMC) e medir o sofrimento mental dos alunos de graduação da USP São Carlos. O modelo de dois parâmetros da TRI foi considerado o mais adequado para a obtenção dos resultados. A partir desse modelo, foi possível a compreensão da gravidade dos sintomas avaliados e da capacidade discriminativa de cada item. De maneira geral, verificou-se que as questões mais relacionadas ao aspecto emocional são mais significativas para indicar algum sofrimento mental em comparação com as questões de caráter físico. Esses resultados mostram que o SRQ-20 é uma ferramenta importante e capaz de auxiliar na avaliação da saúde mental dos estudantes, com base em suas respostas no questionário.
 
-<!-- # 7 Referências -->
+# 7 Referências
 
 [^1]: Sartes, L. M. A. & Souza-Formigoni, M. L. O. (2013). Avanços na Psicometria: Da Teoria Clássica dos Testes à Teoria de Resposta ao Item. Disponível em https://doi.org/10.1590/S0102-79722013000200004
 
@@ -676,8 +676,6 @@ A análise psicométrica da escala SRQ-20 realizada neste estudo evidenciou que 
 [^3]: Pasquali, Luiz, & Primi, Ricardo. (2003). Fundamentos da teoria da resposta ao item: TRI. Avaliação Psicológica, 2(2), 99-110. Disponível em http://pepsic.bvsalud.org/scielo.php?script=sci_arttext&pid=S1677-04712003000200002&lng=pt&tlng=pt
 
 [^4]: Gadermann, A., Guhn, M. and Zumbo, B. (2012) Estimating Ordinal Reliability for Likert-Type and Ordinal Item Response Data: A Conceptual, Empirical, and Practical Guide. Practical Assessment, Research & Evaluation, 17, 1-13. Disponível em https://files.eric.ed.gov/fulltext/EJ977577.pdf
-
-[^17]: Zumbo, Bruno D.; Gadermann, Anne M.; and Zeisser, Cornelia (2007) "Ordinal Versions of Coefficients Alpha and Theta for Likert Rating Scales," Journal of Modern Applied Statistical Methods: Vol. 6 : Iss. 1 , Article 4. DOI: 10.22237/jmasm/1177992180 Disponível em: http://digitalcommons.wayne.edu/jmasm/vol6/iss1/4
 
 [^5]: Material preparado pelo Prof. Dr. César Gonçalves de Lima – FZEA/USP. Disponível em https://edisciplinas.usp.br/pluginfile.php/8009978/mod_resource/content/2/GIA5005%20%2811%29%20-%20An%C3%A1lise%20de%20itens%20%28alfa%20de%20Cronbach%29.pdf
 
@@ -705,3 +703,5 @@ A análise psicométrica da escala SRQ-20 realizada neste estudo evidenciou que 
 Disponível em https://cran.r-project.org/web/packages/psychTools/vignettes/factor.pdf
 
 [^16]: Wright, B. D., & Stone, M. H. (1979). Best test design. Mesa Press.
+
+[^17]: Zumbo, Bruno D.; Gadermann, Anne M.; and Zeisser, Cornelia (2007) "Ordinal Versions of Coefficients Alpha and Theta for Likert Rating Scales," Journal of Modern Applied Statistical Methods: Vol. 6 : Iss. 1 , Article 4. DOI: 10.22237/jmasm/1177992180 Disponível em: http://digitalcommons.wayne.edu/jmasm/vol6/iss1/4
