@@ -1,1 +1,20 @@
-# Em breve
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "dos Santos Amaral"
+  given-names: "Gabriela"
+  orcid: "https://orcid.org/0009-0007-1775-7359"
+- family-names: "Quatrochi"
+  given-names: "Brunna"
+  orcid: "https://orcid.org/0009-0004-4049-265X"
+- family-names: "Bazán Guzmán"
+  given-names: "Jorge Luis"
+  orcid: "https://orcid.org/0000-0003-3918-8795"
+- family-names: "Pap da Silva"
+  given-names: "Emanuela"
+  orcid: "https://orcid.org/0000-0003-3180-467X"
+title: "Analise Psicometrica SQR20"
+version: 1.0.0
+doi: https://doi.org/10.5281/zenodo.15246854
+date-released: 2025-04-19
+url: "https://github.com/jlbazan/Analise_Psicometrica_SQR20"
