@@ -26,7 +26,6 @@ spondentes com diferentes níveis de sofrimento mental avaliado. Uma avaliação
  resultados foram salvos. A análise realizada neste estudo permitiu identificar as características psicométricas
  dos itens, oferecendo uma compreensão mais aprofundada das propriedades do instrumento e sua adequação
  para avaliar a saúde mental dos estudantes.
- Introdução
  
 ## Instalação dos pacotes do R
 
