@@ -16,8 +16,7 @@ Universidade de São Paulo, São Carlos, Brasil
  itens dicotômicos que avaliam indicadores de transtornos mentais comuns (TMC), com respostas “sim” ou
  “não”. Foram utilizadas bases de dados dos anos de 2021, 2022 e 2023, obtidas por meio de questionários
  aplicados pela GAPSI e Apoia USP, que são serviços de apoio psicossocial à saúde mental da comunidade
- universitária da USP, campus de São Carlos, respondidos por alunos de graduação deste campus. Os re
-sultados indicam que o teste é confiável e unidimensional, e os escores do TMC podem ser obtidos tanto
+ universitária da USP, campus de São Carlos, respondidos por alunos de graduação deste campus. Os resultados indicam que o teste é confiável e unidimensional, e os escores do TMC podem ser obtidos tanto
  pela teoria clássica dos testes quanto pelo modelo de dois parâmetros da teoria da resposta ao item (TRI).
  O modelo TRI de dois parâmetros foi escolhido como o melhor modelo para reportar os escores do TMC
  que medem o sofrimento mental. No modelo escolhido, os itens são caracterizados pelos parâmetros de
