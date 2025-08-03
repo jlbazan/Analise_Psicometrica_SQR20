@@ -45,7 +45,7 @@ install.packages("openxlsx")
 ```
 ## Como citar este trabalho
 
-Amaral, G., Quatrochi, B., Bazán, J. L and da Pap da Silva, E. (2025). Análise Psicométrica da escala de rastreio SQR-20 usando dados do GAPSI e Apoia USP. 
+Amaral, G., Quatrochi, B., Bazán, J. L and Pap da Silva, E. (2025). Análise Psicométrica da escala de rastreio SQR-20 usando dados do GAPSI e Apoia USP. 
 Version v1.0. DOI: https://doi.org/10.5281/zenodo.15246854
 
 Se preferir, é possível incluir a seguinte entrada BibTeX:
